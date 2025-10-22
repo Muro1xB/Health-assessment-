@@ -1,0 +1,3456 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة التمريض الذكية - Health Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --font-ar: 'Cairo', sans-serif;
+            --font-en: 'Roboto', sans-serif;
+            
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
+            
+            --secondary: #10B981;
+            --secondary-dark: #059669;
+            --secondary-light: #34D399;
+            
+            --accent: #F59E0B;
+            --accent-dark: #D97706;
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            
+            --bg: #FFFFFF;
+            --bg-secondary: #F9FAFB;
+            --bg-card: #FFFFFF;
+            
+            --text: #111827;
+            --text-light: #6B7280;
+            
+            --border: #E5E7EB;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        body.dark-mode {
+            --bg: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-card: #1E293B;
+            --text: #F1F5F9;
+            --text-light: #CBD5E1;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-ar);
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .english-text {
+            font-family: var(--font-en);
+        }
+
+        /* Welcome Screen */
+        #welcome-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .welcome-content {
+            text-align: center;
+            color: white;
+            animation: welcomeSlideUp 0.8s ease-out;
+        }
+
+        @keyframes welcomeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .lecture-en-big {
+            font-size: 3.5rem;
+            font-weight: 900;
+            font-family: var(--font-en);
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .lecture-ar-big {
+            font-size: 3rem;
+            font-weight: 900;
+            font-family: var(--font-ar);
+            color: #FFD700;
+            text-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .developer-credit {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: var(--font-en);
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+            to { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9)); }
+        }
+
+        .loading-bar {
+            width: 400px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 2rem auto 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FF6B6B, #FFD700);
+            background-size: 200% 100%;
+            animation: loadProgress 4s ease-in-out forwards, shimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadProgress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.dark-mode header {
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        header.hidden { 
+            transform: translateY(-100%); 
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .developer-name {
+            font-family: var(--font-en);
+            font-size: 1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 25%, #45B7D1 50%, #F7DC6F 75%, #BB8FCE 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .main-nav a {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .main-nav a:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .main-nav a.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Main Content */
+        main {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            padding: 2rem 1rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .page.active-page {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Content Sections */
+        .concept-slide, .numbered-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .concept-slide h2, .numbered-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+
+        .numbered-item {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-right: 3rem;
+        }
+
+        .numbered-item::before {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .dual-text-row {
+            display: flex;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .english-side, .arabic-side {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+        }
+
+        .english-side {
+            font-family: var(--font-en);
+            border-left: 4px solid var(--primary);
+        }
+
+        .arabic-side {
+            border-right: 4px solid var(--secondary);
+        }
+
+        /* Flashcards */
+        .flashcard-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .flashcard {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            perspective: 1000px;
+            margin-bottom: 2rem;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .flashcard-front {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .flashcard-back {
+            background: var(--gradient-secondary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .flashcard h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #FFD700;
+        }
+
+        .flashcard-counter {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        .flashcard-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flashcard-controls button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .flashcard-controls button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .speak-flashcard-btn {
+            background: var(--gradient-secondary) !important;
+        }
+
+        /* Question Bank */
+        .question-card {
+            margin-bottom: 2rem;
+        }
+
+        .question-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .question-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .options {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option {
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            transform: translateX(5px);
+            border-color: var(--primary);
+        }
+
+        .option.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--secondary);
+        }
+
+        .option.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #EF4444;
+        }
+
+        .explanation {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid var(--primary-light);
+            margin-top: 1rem;
+        }
+
+        .explanation h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Exam Tricks */
+        .trick-card {
+            margin-bottom: 2rem;
+        }
+
+        .trick-explanation {
+            margin-bottom: 2rem;
+        }
+
+        .trick-explanation h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .keywords-master-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 2px solid var(--accent);
+        }
+
+        .keywords-master-box h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--accent);
+        }
+
+        .keyword-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .keyword-item {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .keyword-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .keyword-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .keyword-icon {
+            font-size: 1.5rem;
+        }
+
+        .keyword-header h4 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        /* Comparisons */
+        .comparison-container {
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+        }
+
+        .comparison-header {
+            display: flex;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem;
+        }
+
+        .comparison-title-en, .comparison-title-ar {
+            flex: 1;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .comparison-vs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 0 1rem;
+        }
+
+        .comparison-row, .comparison-row-ar {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-row:last-child, .comparison-row-ar:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-cell-left, .comparison-cell-right {
+            flex: 1;
+            padding: 1rem;
+        }
+
+        .comparison-cell-left {
+            border-right: 1px solid var(--border);
+        }
+
+        .comparison-cell-left-ar, .comparison-cell-right-ar {
+            flex: 1;
+            padding: 1rem;
+        }
+
+        .comparison-cell-left-ar {
+            border-right: 1px solid var(--border);
+        }
+
+        .comparison-cell h4, .comparison-cell-ar h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        /* Audio Dictionary */
+        .glossary-item {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .glossary-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .glossary-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .glossary-item h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .speak-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--gradient-secondary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .speak-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Important Numbers */
+        .number-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .number-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .number-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .number-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .number-highlight {
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin: 1rem 0;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #1E40AF, #2563EB, #10B981);
+            color: white;
+            padding: 4rem 2rem;
+            margin-top: 5rem;
+            border-top: 5px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-icon {
+            font-size: 2.5rem;
+        }
+
+        .contact-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .contact-number {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #FFD700;
+        }
+
+        .footer-dedication {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin: 3rem auto;
+            max-width: 900px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dedication-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .footer-dedication h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #FFD700;
+        }
+
+        .footer-dedication p {
+            font-size: 1.2rem;
+            line-height: 2;
+            font-weight: 600;
+        }
+
+        .footer-dedication strong {
+            color: #FFD700;
+            font-size: 1.1rem;
+        }
+
+        .footer-developer {
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            padding-top: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-nav {
+                justify-content: center;
+            }
+
+            .main-nav a {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .dual-text-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .lecture-en-big {
+                font-size: 2.5rem;
+            }
+
+            .lecture-ar-big {
+                font-size: 2rem;
+            }
+
+            .loading-bar {
+                width: 300px;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .contact-item {
+                width: 100%;
+            }
+
+            .footer-dedication {
+                padding: 2rem 1rem;
+            }
+
+            .footer-dedication p {
+                font-size: 1rem;
+            }
+
+            .number-highlight {
+                font-size: 3rem;
+            }
+
+            .keyword-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+        <div class="welcome-content">
+            <div class="welcome-icon">🩺</div>
+            <div class="lecture-title-main">
+                <p class="lecture-en-big">Health Assessment</p>
+                <p class="lecture-ar-big">التقييم الصحي</p>
+            </div>
+            <p class="developer-credit">by Mohamed Salah</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="site-title">📚 منصة التمريض الذكية</div>
+                <div class="developer-name">by Mohamed Salah</div>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="#" onclick="navigateToPage('page1', this)" class="active">📖 الشرح</a>
+                <a href="#" onclick="navigateToPage('page2', this)">🎴 فلاش كاردز</a>
+                <a href="#" onclick="navigateToPage('page3', this)">❓ بنك الأسئلة</a>
+                <a href="#" onclick="navigateToPage('page4', this)">💡 التريكات</a>
+                <a href="#" onclick="navigateToPage('page5', this)">📝 المراجعة</a>
+                <a href="#" onclick="navigateToPage('page6', this)">🔄 المقارنات</a>
+                <a href="#" onclick="navigateToPage('page7', this)">🔊 القاموس</a>
+                <a href="#" onclick="navigateToPage('page8', this)">🔢 الأرقام</a>
+            </nav>
+            
+            <button class="theme-toggle" onclick="toggleDarkMode()">🌙</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Page 1: Detailed Explanation -->
+        <div id="page1" class="page active-page">
+            <h1>📖 Detailed Explanation - الشرح المفصل</h1>
+            
+            <div class="concept-slide numbered-section">
+                <h2>Introduction on Health Assessment (مقدمة في التقييم الصحي)</h2>
+                
+                <div class="numbered-item">
+                    <h3>Health Assessment Definition (تعريف التقييم الصحي)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>The first step of the nursing process, it is the process of gathering information about a client's health and includes systemic collection, verification, interpretation and documentation of data for use by health care professionals.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>الخطوة الأولى في عملية التمريض، وهي عملية جمع المعلومات عن صحة العميل وتشمل الجمع المنهجي والتحقق والتفسير والتوثيق للبيانات لاستخدامها من قبل متخصصي الرعاية الصحية.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Nursing Process (عملية التمريض)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Assessment:</strong> The collection of subjective and objective data</p>
+                            <p><strong>Diagnosis:</strong> The development of a nursing diagnosis based on the subjective and objective data obtained.</p>
+                            <p><strong>Planning:</strong> The development of a plan for the patient, with long- and short-term goals</p>
+                            <p><strong>Implementation:</strong> The implementation of the plan.</p>
+                            <p><strong>Evaluation:</strong> The evaluation of the plan as which interventions were successful and which were not.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>التقييم:</strong> جمع البيانات الذاتية والموضوعية</p>
+                            <p><strong>التشخيص:</strong> تطوير تشخيص تمريضي بناءً على البيانات الذاتية والموضوعية التي تم الحصول عليها.</p>
+                            <p><strong>التخطيط:</strong> تطوير خطة للمريض، مع أهداف طويلة وقصيرة المدى</p>
+                            <p><strong>التنفيذ:</strong> تنفيذ الخطة.</p>
+                            <p><strong>التقييم النهائي:</strong> تقييم الخطة لمعرفة التدخلات التي كانت ناجحة والتي لم تكن كذلك.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Purposes of Health Assessment (أغراض التقييم الصحي)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>1. To identify the patient's health status.</p>
+                            <p>2. Identify actual and/or potential health problems.</p>
+                            <p>3. To establish nursing diagnosis and plan patient's care.</p>
+                            <p>4. To evaluate the outcomes and progress of patient's condition.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>1. لتحديد الحالة الصحية للمريض.</p>
+                            <p>2. تحديد المشاكل الصحية الفعلية و/أو المحتملة.</p>
+                            <p>3. لوضع تشخيص تمريضي وتخطيط رعاية المريض.</p>
+                            <p>4. لتقييم النتائج وتقدم حالة المريض.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Types of Assessment (أنواع التقييم)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>1. Comprehensive assessment:</strong> (as admission assessment) includes current health problems, past medical history, family history, lifestyle, review of systems, and complete physical examination.</p>
+                            <p><strong>2. Follow-Up Assessment:</strong> Assessment done after a health problem has been identified. It establishes a diagnosis or problem that need follow-up care as fever (high body temperature).</p>
+                            <p><strong>3. Focused Assessment:</strong> The patient has a specific health problem that needs immediate attention. It is commonly performed after the initial comprehensive assessment has been done. (as Assessing intake & output)</p>
+                            <p><strong>4. Emergency Assessment:</strong> A rapid assessment is performed when the patient is at risk of death or serious problems and must initiated immediately to save the patient's life or prevent further injury as bleeding.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>1. التقييم الشامل:</strong> (مثل تقييم القبول) يشمل المشاكل الصحية الحالية، التاريخ الطبي السابق، التاريخ العائلي، نمط الحياة، مراجعة الأنظمة، والفحص الجسدي الكامل.</p>
+                            <p><strong>2. تقييم المتابعة:</strong> يتم بعد تحديد مشكلة صحية. يحدد تشخيصًا أو مشكلة تحتاج إلى رعاية متابعة مثل الحمى (ارتفاع درجة حرارة الجسم).</p>
+                            <p><strong>3. التقييم المركز:</strong> لدى المريض مشكلة صحية محددة تحتاج إلى اهتمام فوري. يتم عادة بعد إجراء التقييم الشامل الأولي. (مثل تقييم المدخول والمخرجات)</p>
+                            <p><strong>4. التقييم الطارئ:</strong> يتم إجراء تقييم سريع عندما يكون المريض معرضًا لخطر الموت أو مشاكل خطيرة ويجب البدء فورًا لإنقاذ حياة المريض أو منع المزيد من الإصابات مثل النزيف.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Steps of Assessment (خطوات التقييم)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>1. Collecting data from a variety of sources</p>
+                            <p>2. Verification of the data</p>
+                            <p>3. Interpreting of the data</p>
+                            <p>4. Recording or Documenting data</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>1. جمع البيانات من مصادر متنوعة</p>
+                            <p>2. التحقق من البيانات</p>
+                            <p>3. تفسير البيانات</p>
+                            <p>4. تسجيل أو توثيق البيانات</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Types of Data (أنواع البيانات)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>1. Objective data (signs):</strong> Data obtained through observation. It is observed or measured by a health care professional during physical examination; it can be gathered also from lab results or diagnostic tests. e.g blood pressure, edema</p>
+                            <p><strong>2. Subjective data (symptoms):</strong> Data from patient's point of view and include feelings, perceptions, and concerns. They cannot be observed by another (such as pain, dizziness, nausea).</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>1. البيانات الموضوعية (العلامات):</strong> بيانات يتم الحصول عليها من خلال الملاحظة. يتم ملاحظتها أو قياسها بواسطة أخصائي رعاية صحية أثناء الفحص الجسدي؛ يمكن جمعها أيضًا من نتائج المختبر أو الاختبارات التشخيصية. مثال ضغط الدم، الوذمة</p>
+                            <p><strong>2. البيانات الذاتية (الأعراض):</strong> بيانات من وجهة نظر المريض وتشمل المشاعر والإدراك والمخاوف. لا يمكن ملاحظتها من قبل شخص آخر (مثل الألم، الدوار، الغثيان).</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>The Process of Assessing a Patient's Health (عملية تقييم صحة المريض)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>I - INTERVIEW:</strong> Collecting subjective data</p>
+                            <p><strong>H - HISTORY:</strong> Collecting health history</p>
+                            <p><strong>O - OBSERVATION:</strong> Collecting objective data through observation</p>
+                            <p><strong>P - PHYSICAL EXAMINATION:</strong> Collecting objective data through examination</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>I - المقابلة:</strong> جمع البيانات الذاتية</p>
+                            <p><strong>H - التاريخ الصحي:</strong> جمع التاريخ الصحي</p>
+                            <p><strong>O - الملاحظة:</strong> جمع البيانات الموضوعية من خلال الملاحظة</p>
+                            <p><strong>P - الفحص الجسدي:</strong> جمع البيانات الموضوعية من خلال الفحص</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Interview (المقابلة)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>Health assessment interview provides an opportunity to gather detailed information about events & experiences that have contributed to a patient's current health status. Communication skills play an important role in conducting successful interview & in developing a nurse – patient – relationship.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>توفر مقابلة التقييم الصحي فرصة لجمع معلومات مفصلة حول الأحداث والتجارب التي ساهمت في الحالة الصحية الحالية للمريض. تلعب مهارات التواصل دورًا مهمًا في إجراء مقابلة ناجحة وفي تطوير علاقة الممرضة بالمريض.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>The Purpose of the Interview (غرض المقابلة)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Collect:</strong> Collect data about the patient's demographical data, social background, support systems & health status.</p>
+                            <p><strong>Establish:</strong> Establish a relationship between the nurse & the patient (Rapport, trust).</p>
+                            <p><strong>Formulate:</strong> Formulate an idea about possible nursing diagnosis.</p>
+                            <p><strong>Identify:</strong> Identify the patient's special concerns- health & illness perception, health promoting behaviors, & health care.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>جمع:</strong> جمع بيانات عن البيانات الديموغرافية للمريض، والخلفية الاجتماعية، وأنظمة الدعم والحالة الصحية.</p>
+                            <p><strong>إقامة:</strong> إقامة علاقة بين الممرضة والمريض (الثقة، الود).</p>
+                            <p><strong>صياغة:</strong> صياغة فكرة حول التشخيص التمريضي المحتمل.</p>
+                            <p><strong>تحديد:</strong> تحديد مخاوف المريض الخاصة - إدراك الصحة والمرض، والسلوكيات المعززة للصحة، والرعاية الصحية.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Phases of Interview (مراحل المقابلة)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>1. Introductory phase:</strong> Establish rapport relationship, Ensure comfortable setting, State purpose of the interview.</p>
+                            <p><strong>2. Working phase:</strong> The data collecting phase - Collect personal data, Collect data about the patient's health status, Identify the patient's health needs.</p>
+                            <p><strong>3. Termination phase:</strong> At the end summarize the data collected to ensure there nothing is missed.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>1. المرحلة التمهيدية:</strong> إقامة علاقة ودية، ضمان بيئة مريحة، تحديد غرض المقابلة.</p>
+                            <p><strong>2. المرحلة العاملة:</strong> مرحلة جمع البيانات - جمع البيانات الشخصية، جمع بيانات عن الحالة الصحية للمريض، تحديد احتياجات المريض الصحية.</p>
+                            <p><strong>3. مرحلة الإنهاء:</strong> في النهاية، تلخيص البيانات التي تم جمعها لضمان عدم فوات أي شيء.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Tips for Conducting Interview (نصائح لإجراء المقابلة)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>• Demonstrate professional appearance and behavior</p>
+                            <p>• Provide for privacy</p>
+                            <p>• Provide a quiet and non-distracting environment</p>
+                            <p>• Address the patient by the appropriate title (Mr., Mrs., Ms.)</p>
+                            <p>• Always introduce yourself to a new patient and identify your role</p>
+                            <p>• Request the patient's permission to conduct the health history</p>
+                            <p>• Avoid language barriers</p>
+                            <p>• Observe nonverbal behaviors throughout the interview</p>
+                            <p>• Give the patient adequate time to respond</p>
+                            <p>• Use open-ended questions, whenever possible</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>• إظهار المظهر والسلوك المهني</p>
+                            <p>• توفير الخصوصية</p>
+                            <p>• توفير بيئة هادئة وغير مشتتة</p>
+                            <p>• مخاطبة المريض باللقب المناسب (السيد، السيدة، الآنسة)</p>
+                            <p>• قدم نفسك دائمًا للمريض الجديد وحدد دورك</p>
+                            <p>• اطلب إذن المريض لإجراء التاريخ الصحي</p>
+                            <p>• تجنب الحواجز اللغوية</p>
+                            <p>• لاحظ السلوكيات غير اللفظية طوال المقابلة</p>
+                            <p>• أعطِ المريض وقتًا كافيًا للرد</p>
+                            <p>• استخدم الأسئلة المفتوحة، كلما أمكن ذلك</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Specific Communication Skills (مهارات التواصل المحددة)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>1. Listening:</strong> Be comfortably seated about 3 ft away from the patient and Maintain eye contact and avoid interrupting the patient.</p>
+                            <p><strong>2. Silence:</strong> Do not rush the patient, allow the patient time to contemplate all answers.</p>
+                            <p><strong>3. Use Open-Ended Questions:</strong> Ask the patient specific question that will allow the patient to discuss symptoms or their medical condition. A typical open-ended question is "How are you feeling today?" or "Tell me about your pain symptoms."</p>
+                            <p><strong>4. Avoid Closed-Ended questions:</strong> A closed-ended question requires a one- or two-word response from the patient which requires a yes or no response.</p>
+                            <p><strong>5. Avoiding Misleading Questions:</strong> The nurse avoid adding words or questions to the conversation misleading the patient. For example, "You do not smoke cigarettes, do you?"</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>1. الاستماع:</strong> كن جالسًا بشكل مريح على بعد حوالي 3 أقدام من المريض وحافظ على التواصل البصري وتجنب مقاطعة المريض.</p>
+                            <p><strong>2. الصمت:</strong> لا تستعجل المريض، امنح المريض وقتًا للتفكير في جميع الإجابات.</p>
+                            <p><strong>3. استخدام الأسئلة المفتوحة:</strong> اسأل المريض سؤالاً محددًا يسمح للمريض بمناقشة الأعراض أو حالته الطبية. سؤال مفتوح نموذجي هو "كيف تشعر اليوم؟" أو "أخبرني عن أعراض الألم لديك."</p>
+                            <p><strong>4. تجنب الأسئلة المغلقة:</strong> السؤال المغلق يتطلب من المريض إجابة من كلمة أو كلمتين تتطلب إجابة بنعم أو لا.</p>
+                            <p><strong>5. تجنب الأسئلة المضللة:</strong> تتجنب الممرضة إضافة كلمات أو أسئلة إلى المحادثة تضلل المريض. على سبيل المثال، "أنت لا تدخن السجائر، أليس كذلك؟"</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Health History (التاريخ الصحي)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>A health history is a record containing information about a patient's past history / present health status and the patient's personal habits.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>التاريخ الصحي هو سجل يحتوي على معلومات عن التاريخ السابق للمريض / الحالة الصحية الحالية وعادات المريض الشخصية.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Complete Health History Components (مكونات التاريخ الصحي الكامل)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>1. Demographic Data:</strong> Age, Sex, level of education, Marital Status, Occupation, & Religion</p>
+                            <p><strong>2. Chief Complaints:</strong> The reason for seeking health care {usually in the clients own word} description of the problem using COLDSPA mnemonic</p>
+                            <p><strong>3. History of Present Health Concern:</strong> Chronologic record of the reason for seeking care, from the time of the onset of the symptoms until now</p>
+                            <p><strong>4. Past Health History:</strong> General state of health, childhood, adult and psychiatric illness, accident and injuries, operations and previous hospitalization</p>
+                            <p><strong>5. Current Health Status:</strong> Medications, allergies to food or medications, smoking, drug abuse, diet, screening test, immunization, sleep pattern, exercises, environmental hazards and safety</p>
+                            <p><strong>6. Psychosocial history:</strong> Home situation and significant others, psychological stressors.</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>1. البيانات الديموغرافية:</strong> العمر، الجنس، المستوى التعليمي، الحالة الاجتماعية، المهنة، والديانة</p>
+                            <p><strong>2. الشكاوى الرئيسية:</strong> سبب طلب الرعاية الصحية {عادة بكلمات العميل الخاصة} وصف المشكلة باستخدام اختصار COLDSPA</p>
+                            <p><strong>3. تاريخ الاهتمام الصحي الحالي:</strong> سجل زمني لسبب طلب الرعاية، من وقت بداية الأعراض حتى الآن</p>
+                            <p><strong>4. التاريخ الصحي السابق:</strong> الحالة الصحية العامة، أمراض الطفولة، البالغين والأمراض النفسية، الحوادث والإصابات، العمليات والاستشفاء السابق</p>
+                            <p><strong>5. الحالة الصحية الحالية:</strong> الأدوية، الحساسية من الطعام أو الأدوية، التدخين، إساءة استخدام المخدرات، النظام الغذائي، اختبار الفحص، التطعيم، نمط النوم، التمارين، المخاطر البيئية والسلامة</p>
+                            <p><strong>6. التاريخ النفسي الاجتماعي:</strong> الوضع المنزلي والآخرون المهمون، مسببات الإجهاد النفسي.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Chief Complaint Description (وصف الشكوى الرئيسية)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>COLDSPA Mnemonic:</strong></p>
+                            <p><strong>C - Character:</strong> describe the sign or symptom. How does it feel (sharp, dull, aching, throbbing), look (shiny, bumpy, red, swollen, bruised), sound (loud, soft, rasping), smell (foul, sweet, pungent) and so forth?</p>
+                            <p><strong>O - Onset:</strong> when did it begin?</p>
+                            <p><strong>L - Location:</strong> where is it? Does it radiate?</p>
+                            <p><strong>D - Duration:</strong> how long does it last? Does it recur?</p>
+                            <p><strong>S - Severity:</strong> how bad is it?</p>
+                            <p><strong>P - Pattern:</strong> what makes it better: what makes it worse?</p>
+                            <p><strong>A - Associated factors:</strong> what other symptoms occur with it?</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>اختصار COLDSPA:</strong></p>
+                            <p><strong>C - الطبيعة:</strong> صف العلامة أو العرض. كيف تشعر (حاد، خفيف، مؤلم، نابض)، تبدو (لامع، متعرج، أحمر، متورم، كدم)، صوت (عالي، هادئ، أجش)، رائحة (كريهة، حلوة، حادة) وهكذا؟</p>
+                            <p><strong>O - البداية:</strong> متى بدأت؟</p>
+                            <p><strong>L - الموقع:</strong> أين هي؟ هل تشع؟</p>
+                            <p><strong>D - المدة:</strong> كم تدوم؟ هل تتكرر؟</p>
+                            <p><strong>S - الشدة:</strong> مدى سوءها؟</p>
+                            <p><strong>P - النمط:</strong> ما الذي يجعلها أفضل: ما الذي يجعلها أسوأ؟</p>
+                            <p><strong>A - العوامل المرتبطة:</strong> ما هي الأعراض الأخرى التي تحدث معها؟</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 2: Flashcards -->
+        <div id="page2" class="page">
+            <h1>🎴 Flashcards - البطاقات التعليمية</h1>
+            
+            <div class="flashcard-section">
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h2 id="card-front-text">Assessment</h2>
+                        </div>
+                        <div class="flashcard-back">
+                            <!-- يملأ ديناميكياً -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flashcard-counter">
+                    <span id="current-card">1</span> / <span id="total-cards">30</span>
+                </div>
+                
+                <div class="flashcard-controls">
+                    <button onclick="prevCard()">⏮️ Previous - السابق</button>
+                    <button onclick="flipCard()">🔄 Flip - اقلب</button>
+                    <button onclick="speakFlashcard()" class="speak-flashcard-btn">🔊 Pronounce - انطق</button>
+                    <button onclick="nextCard()">Next - التالي ⏭️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 3: Question Bank -->
+        <div id="page3" class="page">
+            <h1>❓ Question Bank - بنك الأسئلة</h1>
+            
+            <div class="question-card numbered-section">
+                <div class="numbered-item">
+                    <h3>Question 1</h3>
+                    <h4>Which phase is considered the first step of the nursing process?</h4>
+                    <h4>أي مرحلة تعتبر الخطوة الأولى في عملية التمريض؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Diagnosis - التشخيص</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Planning - التخطيط</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Assessment - التقييم</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Evaluation - التقييم النهائي</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Assessment</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Assessment is always the first step in the nursing process<br>
+                                - It involves collecting data about the patient's health status<br>
+                                - Without assessment, proper diagnosis and planning cannot occur
+                            </div>
+                            <div class="arabic-side">
+                                - التقييم دائماً الخطوة الأولى في عملية التمريض<br>
+                                - يتضمن جمع بيانات عن الحالة الصحية للمريض<br>
+                                - بدون تقييم، لا يمكن حدوث تشخيص وتخطيط صحيحين
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 2</h3>
+                    <h4>The main purpose of health assessment is to:</h4>
+                    <h4>الغرض الرئيسي من التقييم الصحي هو:</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Prescribe treatment - وصف العلاج</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) Identify patient's health status and problems - تحديد الحالة الصحية للمريض ومشاكله</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Prevent hospital admissions - منع دخول المستشفى</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Only collect patient's demographic data - جمع البيانات الديموغرافية للمريض فقط</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) Identify patient's health status and problems</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - The primary purpose is to identify health status and problems<br>
+                                - This information guides all subsequent nursing actions<br>
+                                - Treatment prescription comes after assessment and diagnosis
+                            </div>
+                            <div class="arabic-side">
+                                - الغرض الأساسي هو تحديد الحالة الصحية والمشاكل<br>
+                                - هذه المعلومات توجه جميع الإجراءات التمريضية اللاحقة<br>
+                                - وصف العلاج يأتي بعد التقييم والتشخيص
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 3</h3>
+                    <h4>Which type of assessment is performed on admission and includes history, lifestyle, and physical examination?</h4>
+                    <h4>أي نوع من التقييم يتم عند القبول ويشمل التاريخ ونمط الحياة والفحص الجسدي؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Emergency assessment - التقييم الطارئ</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Focused assessment - التقييم المركز</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Comprehensive assessment - التقييم الشامل</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Follow-up assessment - تقييم المتابعة</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Comprehensive assessment</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Comprehensive assessment is performed on admission<br>
+                                - It includes complete health history, lifestyle, and physical examination<br>
+                                - It provides a baseline of the patient's health status
+                            </div>
+                            <div class="arabic-side">
+                                - يتم إجراء التقييم الشامل عند القبول<br>
+                                - يشمل التاريخ الصحي الكامل ونمط الحياة والفحص الجسدي<br>
+                                - يوفر خط أساس للحالة الصحية للمريض
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 4</h3>
+                    <h4>A nurse assessing intake and output for a patient is performing which type of assessment?</h4>
+                    <h4>ممرضة تقوم بتقييم المدخول والمخرجات للمريض تقوم بأي نوع من التقييم؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Comprehensive assessment - التقييم الشامل</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) Focused assessment - التقييم المركز</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Emergency assessment - التقييم الطارئ</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Follow-up assessment - تقييم المتابعة</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) Focused assessment</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Focused assessment addresses a specific health problem<br>
+                                - Assessing intake and output focuses on fluid balance<br>
+                                - It's performed after initial comprehensive assessment
+                            </div>
+                            <div class="arabic-side">
+                                - التقييم المركز يعالج مشكلة صحية محددة<br>
+                                - تقييم المدخول والمخرجات يركز على توازن السوائل<br>
+                                - يتم بعد التقييم الشامل الأولي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 5</h3>
+                    <h4>Rapid assessment done in life-threatening conditions, such as massive bleeding, is called:</h4>
+                    <h4>التقييم السريع الذي يتم في ظروف تهدد الحياة، مثل النزيف الشديد، يسمى:</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Comprehensive assessment - التقييم الشامل</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Follow-up assessment - تقييم المتابعة</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Emergency assessment - التقييم الطارئ</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Initial assessment - التقييم الأولي</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Emergency assessment</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Emergency assessment is rapid and done in life-threatening situations<br>
+                                - It prioritizes immediate threats to life<br>
+                                - Examples include massive bleeding, cardiac arrest, respiratory distress
+                            </div>
+                            <div class="arabic-side">
+                                - التقييم الطارئ سريع ويتم في مواقف تهدد الحياة<br>
+                                - يحدد أولويات التهديدات الفورية للحياة<br>
+                                - الأمثلة تشمل النزيف الشديد، توقف القلب، ضائقة تنفسية
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 6</h3>
+                    <h4>Which of the following is an example of subjective data?</h4>
+                    <h4>أي من الأمثلة التالية هو مثال على البيانات الذاتية؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Blood pressure 140/90 mmHg - ضغط الدم 140/90 مم زئبق</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Edema in legs - وذمة في الساقين</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Patient reports feeling dizzy - المريض يبلغ عن شعور بالدوار</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Laboratory report of high blood sugar - تقرير المختبر عن ارتفاع سكر الدم</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Patient reports feeling dizzy</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Subjective data is what the patient says or feels<br>
+                                - Dizziness is a feeling only the patient can describe<br>
+                                - Objective data can be measured or observed by others
+                            </div>
+                            <div class="arabic-side">
+                                - البيانات الذاتية هي ما يقوله أو يشعر به المريض<br>
+                                - الدوار هو شعور لا يمكن للمريض إلا وصفه<br>
+                                - البيانات الموضوعية يمكن قياسها أو ملاحظتها من قبل الآخرين
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 7</h3>
+                    <h4>Information obtained from the patient's family or medical records is considered:</h4>
+                    <h4>المعلومات التي تم الحصول عليها من عائلة المريض أو السجلات الطبية تعتبر:</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Primary source - المصدر الأساسي</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Objective data - البيانات الموضوعية</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Secondary source - المصدر الثانوي</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Subjective data - البيانات الذاتية</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Secondary source</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Secondary source comes from someone other than the patient<br>
+                                - Family members and medical records are secondary sources<br>
+                                - Primary source is information directly from the patient
+                            </div>
+                            <div class="arabic-side">
+                                - المصدر الثانوي يأتي من شخص غير المريض<br>
+                                - أفراد العائلة والسجلات الطبية هي مصادر ثانوية<br>
+                                - المصدر الأساسي هو المعلومات مباشرة من المريض
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 8</h3>
+                    <h4>Which phase of the health interview focuses on data collection?</h4>
+                    <h4>أي مرحلة من مراحل المقابلة الصحية تركز على جمع البيانات؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Introductory phase - المرحلة التمهيدية</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) Working phase - المرحلة العاملة</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Termination phase - مرحلة الإنهاء</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Planning phase - مرحلة التخطيط</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) Working phase</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - The working phase is the main data collection phase<br>
+                                - It involves gathering personal and health information<br>
+                                - Introductory phase establishes rapport, termination summarizes
+                            </div>
+                            <div class="arabic-side">
+                                - المرحلة العاملة هي مرحلة جمع البيانات الرئيسية<br>
+                                - تتضمن جمع المعلومات الشخصية والصحية<br>
+                                - المرحلة التمهيدية تقيم العلاقة، والإنهاء يلخص
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 9</h3>
+                    <h4>Which communication skill involves giving the patient time to think and answer without rushing?</h4>
+                    <h4>أي مهارة تواصل تتضمن إعطاء المريض وقتًا للتفكير والإجابة دون استعجال؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Listening - الاستماع</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) Silence - الصمت</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Closed-ended questioning - الأسئلة المغلقة</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Leading questions - الأسئلة الإيحائية</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) Silence</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Silence allows the patient time to think and respond<br>
+                                - It shows respect and encourages thoughtful answers<br>
+                                - Rushing patients can lead to incomplete information
+                            </div>
+                            <div class="arabic-side">
+                                - الصمت يسمح للمريض بالوقت للتفكير والرد<br>
+                                - يظهر الاحترام ويشجع على الإجابات المدروسة<br>
+                                - استعجال المرضى يمكن أن يؤدي إلى معلومات غير مكتملة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 10</h3>
+                    <h4>The question "Tell me about your pain symptoms" is an example of:</h4>
+                    <h4>السؤال "أخبرني عن أعراض الألم لديك" هو مثال على:</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Closed-ended question - سؤال مغلق</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Leading question - سؤال إيحائي</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Open-ended question - سؤال مفتوح</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Misleading question - سؤال مضلل</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Open-ended question</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Open-ended questions encourage detailed responses<br>
+                                - They begin with words like "tell me," "describe," "what"<br>
+                                - They cannot be answered with a simple yes or no
+                            </div>
+                            <div class="arabic-side">
+                                - الأسئلة المفتوحة تشجع على الردود المفصلة<br>
+                                - تبدأ بكلمات مثل "أخبرني"، "صف"، "ماذا"<br>
+                                - لا يمكن الإجابة عليها بنعم أو لا بسيطة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 11</h3>
+                    <h4>The nurse asks, "You do not smoke cigarettes, do you?" This is an example of:</h4>
+                    <h4>تسأل الممرضة، "أنت لا تدخن السجائر، أليس كذلك؟" هذا مثال على:</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Open-ended question - سؤال مفتوح</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) Leading or misleading question - سؤال إيحائي أو مضلل</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Silence technique - تقنية الصمت</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Rapport-building question - سؤال لبناء العلاقة</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) Leading or misleading question</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Leading questions suggest the desired answer<br>
+                                - They can influence patients to give inaccurate responses<br>
+                                - Better to ask directly: "Do you smoke cigarettes?"
+                            </div>
+                            <div class="arabic-side">
+                                - الأسئلة الإيحائية تقترح الإجابة المطلوبة<br>
+                                - يمكن أن تؤثر على المرضى لإعطاء ردود غير دقيقة<br>
+                                - الأفضل أن تسأل مباشرة: "هل تدخن السجائر؟"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 12</h3>
+                    <h4>The chronological record of symptoms from onset until present is called:</h4>
+                    <h4>السجل الزمني للأعراض من البداية حتى الوقت الحاضر يسمى:</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Chief complaint - الشكوى الرئيسية</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) History of present illness - تاريخ المرض الحالي</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Past medical history - التاريخ الطبي السابق</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Review of systems - مراجعة الأنظمة</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) History of present illness</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - History of present illness documents symptoms chronologically<br>
+                                - It starts from onset and continues to the present<br>
+                                - It helps establish the progression of the current health problem
+                            </div>
+                            <div class="arabic-side">
+                                - تاريخ المرض الحالي يوثق الأعراض بشكل زمني<br>
+                                - يبدأ من البداية ويستمر حتى الوقت الحاضر<br>
+                                - يساعد في تحديد تقدم المشكلة الصحية الحالية
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 13</h3>
+                    <h4>Which part of health history includes allergies, medications, smoking, diet, and immunization?</h4>
+                    <h4>أي جزء من التاريخ الصحي يشمل الحساسية والأدوية والتدخين والنظام الغذائي والتطعيم؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Demographic data - البيانات الديموغرافية</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Psychosocial history - التاريخ النفسي الاجتماعي</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Current health status - الحالة الصحية الحالية</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Past health history - التاريخ الصحي السابق</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Current health status</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Current health status includes medications, allergies, habits<br>
+                                - It covers smoking, diet, immunizations, and more<br>
+                                - This section focuses on present health factors
+                            </div>
+                            <div class="arabic-side">
+                                - الحالة الصحية الحالية تشمل الأدوية والحساسية والعادات<br>
+                                - تغطي التدخين والنظام الغذائي والتطعيمات وأكثر<br>
+                                - هذا القسم يركز على عوامل الصحة الحالية
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 14</h3>
+                    <h4>Which component of a chief complaint description refers to what makes symptoms better or worse?</h4>
+                    <h4>أي مكون من وصف الشكوى الرئيسية يشير إلى ما يجعل الأعراض أفضل أو أسوأ؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Onset - البداية</div>
+                        <div class="option" onclick="checkAnswer(this, true)">B) Pattern - النمط</div>
+                        <div class="option" onclick="checkAnswer(this, false)">C) Severity - الشدة</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Duration - المدة</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: B) Pattern</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Pattern in COLDSPA refers to what makes symptoms better or worse<br>
+                                - It helps identify aggravating and alleviating factors<br>
+                                - This information is valuable for treatment planning
+                            </div>
+                            <div class="arabic-side">
+                                - النمط في COLDSPA يشير إلى ما يجعل الأعراض أفضل أو أسوأ<br>
+                                - يساعد في تحديد العوامل المسببة والمخففة<br>
+                                - هذه المعلومات قيمة لتخطيط العلاج
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Question 15</h3>
+                    <h4>Which statement is true about objective data?</h4>
+                    <h4>أي عبارة صحيحة حول البيانات الموضوعية؟</h4>
+                    
+                    <div class="options">
+                        <div class="option" onclick="checkAnswer(this, false)">A) Includes feelings and perceptions - تشمل المشاعر والإدراك</div>
+                        <div class="option" onclick="checkAnswer(this, false)">B) Cannot be observed by others - لا يمكن ملاحظتها من قبل الآخرين</div>
+                        <div class="option" onclick="checkAnswer(this, true)">C) Obtained through physical examination or lab results - يتم الحصول عليها من خلال الفحص الجسدي أو نتائج المختبر</div>
+                        <div class="option" onclick="checkAnswer(this, false)">D) Only gathered from patient's verbal responses - يتم جمعها فقط من الردود اللفظية للمريض</div>
+                    </div>
+                    
+                    <div class="explanation" style="display:none;">
+                        <h4>✅ Correct Answer: C) Obtained through physical examination or lab results</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                - Objective data can be observed or measured<br>
+                                - It comes from physical examination, tests, or measurements<br>
+                                - It's verifiable by multiple healthcare providers
+                            </div>
+                            <div class="arabic-side">
+                                - البيانات الموضوعية يمكن ملاحظتها أو قياسها<br>
+                                - تأتي من الفحص الجسدي أو الاختبارات أو القياسات<br>
+                                - يمكن التحقق منها من قبل مقدمي الرعاية الصحية المتعددين
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 4: Exam Tricks -->
+        <div id="page4" class="page">
+            <h1>💡 Exam Tricks - تريكات الامتحان</h1>
+            
+            <div class="trick-card numbered-section">
+                <div class="numbered-item">
+                    <h3>Q1 Analysis - تحليل السؤال الأول</h3>
+                    <h4>Which phase is considered the first step of the nursing process?</h4>
+                    
+                    <div class="trick-explanation">
+                        <h4>🔍 How to solve?</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                <strong>Keywords:</strong> "First step"<br>
+                                <strong>Why correct:</strong> Assessment is always the first step in the nursing process<br>
+                                <strong>Memory tip:</strong> ADPIE - Assessment comes first<br>
+                                <strong>Wrong answers:</strong> Diagnosis comes after assessment, Planning after diagnosis, Implementation after planning, Evaluation is last
+                            </div>
+                            <div class="arabic-side">
+                                <strong>الكلمات المفتاحية:</strong> "الخطوة الأولى"<br>
+                                <strong>لماهو صحيح:</strong> التقييم دائماً الخطوة الأولى في عملية التمريض<br>
+                                <strong>نصيحة للحفظ:</strong> ADPIE - التقييم يأتي أولاً<br>
+                                <strong>الإجابات الخاطئة:</strong> التشخيص يأتي بعد التقييم، التخطيط بعد التشخيص، التنفيذ بعد التخطيط، التقييم النهائي هو الأخير
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Q2 Analysis - تحليل السؤال الثاني</h3>
+                    <h4>The main purpose of health assessment is to:</h4>
+                    
+                    <div class="trick-explanation">
+                        <h4>🔍 How to solve?</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                <strong>Keywords:</strong> "Main purpose"<br>
+                                <strong>Why correct:</strong> The primary purpose is to identify health status and problems<br>
+                                <strong>Memory tip:</strong> Assessment = Identification<br>
+                                <strong>Wrong answers:</strong> Prescribing treatment is after diagnosis, Preventing admissions is a potential outcome, Collecting demographic data is only one small part
+                            </div>
+                            <div class="arabic-side">
+                                <strong>الكلمات المفتاحية:</strong> "الغرض الرئيسي"<br>
+                                <strong>لماهو صحيح:</strong> الغرض الأساسي هو تحديد الحالة الصحية والمشاكل<br>
+                                <strong>نصيحة للحفظ:</strong> التقييم = التحديد<br>
+                                <strong>الإجابات الخاطئة:</strong> وصف العلاج بعد التشخيص، منع القبول هو نتيجة محتملة، جمع البيانات الديموغرافية هو جزء صغير واحد فقط
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Q3 Analysis - تحليل السؤال الثالث</h3>
+                    <h4>Which type of assessment is performed on admission and includes history, lifestyle, and physical examination?</h4>
+                    
+                    <div class="trick-explanation">
+                        <h4>🔍 How to solve?</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                <strong>Keywords:</strong> "Admission", "history", "lifestyle", "physical examination"<br>
+                                <strong>Why correct:</strong> Comprehensive assessment includes all these components and is done on admission<br>
+                                <strong>Memory tip:</strong> Comprehensive = Complete = Everything<br>
+                                <strong>Wrong answers:</strong> Emergency is for life-threatening situations, Focused is for specific problems, Follow-up is after problems are identified
+                            </div>
+                            <div class="arabic-side">
+                                <strong>الكلمات المفتاحية:</strong> "القبول"، "التاريخ"، "نمط الحياة"، "الفحص الجسدي"<br>
+                                <strong>لماهو صحيح:</strong> التقييم الشامل يشمل كل هذه المكونات ويتم عند القبول<br>
+                                <strong>نصيحة للحفظ:</strong> الشامل = الكامل = كل شيء<br>
+                                <strong>الإجابات الخاطئة:</strong> الطارئ للحالات التي تهدد الحياة، المركز للمشاكل المحددة، المتابعة بعد تحديد المشاكل
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Q6 Analysis - تحليل السؤال السادس</h3>
+                    <h4>Which of the following is an example of subjective data?</h4>
+                    
+                    <div class="trick-explanation">
+                        <h4>🔍 How to solve?</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                <strong>Keywords:</strong> "Subjective data"<br>
+                                <strong>Why correct:</strong> Subjective data is what the patient reports or feels<br>
+                                <strong>Memory tip:</strong> Subjective = Subject = Patient's perspective<br>
+                                <strong>Wrong answers:</strong> Blood pressure, edema, and lab results are all objective data that can be measured or observed
+                            </div>
+                            <div class="arabic-side">
+                                <strong>الكلمات المفتاحية:</strong> "البيانات الذاتية"<br>
+                                <strong>لماهو صحيح:</strong> البيانات الذاتية هي ما يبلغ عنه أو يشعر به المريض<br>
+                                <strong>نصيحة للحفظ:</strong> الذاتي = الموضوع = منظور المريض<br>
+                                <strong>الإجابات الخاطئة:</strong> ضغط الدم والوذمة ونتائج المختبر كلها بيانات موضوعية يمكن قياسها أو ملاحظتها
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Q10 Analysis - تحليل السؤال العاشر</h3>
+                    <h4>The question "Tell me about your pain symptoms" is an example of:</h4>
+                    
+                    <div class="trick-explanation">
+                        <h4>🔍 How to solve?</h4>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                <strong>Keywords:</strong> "Tell me about"<br>
+                                <strong>Why correct:</strong> Questions starting with "Tell me" are open-ended<br>
+                                <strong>Memory tip:</strong> Open-ended = Open discussion<br>
+                                <strong>Wrong answers:</strong> Closed-ended questions have yes/no answers, Leading questions suggest the answer, Misleading questions confuse the patient
+                            </div>
+                            <div class="arabic-side">
+                                <strong>الكلمات المفتاحية:</strong> "أخبرني عن"<br>
+                                <strong>لماهو صحيح:</strong> الأسئلة التي تبدأ بـ "أخبرني" هي أسئلة مفتوحة<br>
+                                <strong>نصيحة للحفظ:</strong> المفتوح = مناقشة مفتوحة<br>
+                                <strong>الإجابات الخاطئة:</strong> الأسئلة المغلقة لها إجابات نعم/لا، الأسئلة الإيحائية تقترح الإجابة، الأسئلة المضللة تربك المريض
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="keywords-master-box">
+                    <h2>🔑 Answer Keys - مفاتيح الحل</h2>
+                    <p style="text-align:center; font-size:1.3rem; margin-bottom:2rem;">
+                        <strong>شفت الكلمة دي؟ = الإجابة كذا</strong>
+                    </p>
+                    
+                    <div class="keyword-grid">
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>First / Priority / Initial</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Assessment</div>
+                                <div class="arabic-side">→ الإجابة = التقييم</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Main purpose / Primary goal</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Identify health status</div>
+                                <div class="arabic-side">→ الإجابة = تحديد الحالة الصحية</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Admission / Complete / Everything</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Comprehensive assessment</div>
+                                <div class="arabic-side">→ الإجابة = التقييم الشامل</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Specific problem / One area</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Focused assessment</div>
+                                <div class="arabic-side">→ الإجابة = التقييم المركز</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Life-threatening / Emergency</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Emergency assessment</div>
+                                <div class="arabic-side">→ الإجابة = التقييم الطارئ</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Patient says / Feels / Reports</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Subjective data</div>
+                                <div class="arabic-side">→ الإجابة = البيانات الذاتية</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Can measure / Can observe</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Objective data</div>
+                                <div class="arabic-side">→ الإجابة = البيانات الموضوعية</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Tell me / Describe / What</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Open-ended question</div>
+                                <div class="arabic-side">→ الإجابة = سؤال مفتوح</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Yes / No / Do you</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Closed-ended question</div>
+                                <div class="arabic-side">→ الإجابة = سؤال مغلق</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Don't you / Right</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Leading question</div>
+                                <div class="arabic-side">→ الإجابة = سؤال إيحائي</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Family / Records / Chart</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Secondary source</div>
+                                <div class="arabic-side">→ الإجابة = مصدر ثانوي</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Patient directly</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Primary source</div>
+                                <div class="arabic-side">→ الإجابة = مصدر أساسي</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Time to think / No rush</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Silence</div>
+                                <div class="arabic-side">→ الإجابة = الصمت</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>From onset to now</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = History of present illness</div>
+                                <div class="arabic-side">→ الإجابة = تاريخ المرض الحالي</div>
+                            </div>
+                        </div>
+                        
+                        <div class="keyword-item">
+                            <div class="keyword-header">
+                                <span class="keyword-icon">🔴</span>
+                                <h4>Better or worse</h4>
+                            </div>
+                            <div class="dual-text-row">
+                                <div class="english-side">→ Answer = Pattern (in COLDSPA)</div>
+                                <div class="arabic-side">→ الإجابة = النمط (في COLDSPA)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 5: Final Review -->
+        <div id="page5" class="page">
+            <h1>📝 Final Review - المراجعة النهائية</h1>
+            
+            <div class="concept-slide numbered-section">
+                <div class="numbered-item">
+                    <h3>Nursing Process Overview (نظرة عامة على عملية التمريض)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Assessment:</strong> Systematic collection of subjective and objective data to determine a patient's health status</p>
+                            <p><strong>Diagnosis:</strong> Analysis of assessment data to identify actual or potential health problems</p>
+                            <p><strong>Planning:</strong> Development of goals and interventions to address identified problems</p>
+                            <p><strong>Implementation:</strong> Execution of the planned interventions</p>
+                            <p><strong>Evaluation:</strong> Assessment of the effectiveness of interventions and progress toward goals</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>التقييم:</strong> جمع منهجي للبيانات الذاتية والموضوعية لتحديد الحالة الصحية للمريض</p>
+                            <p><strong>التشخيص:</strong> تحليل بيانات التقييم لتحديد المشاكل الصحية الفعلية أو المحتملة</p>
+                            <p><strong>التخطيط:</strong> تطوير الأهداف والتدخلات لمعالجة المشاكل المحددة</p>
+                            <p><strong>التنفيذ:</strong> تنفيذ التدخلات المخطط لها</p>
+                            <p><strong>التقييم النهائي:</strong> تقييم فعالية التدخلات والتقدم نحو الأهداف</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Types of Assessment Summary (ملخص أنواع التقييم)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Comprehensive Assessment:</strong> Complete health history and physical examination, usually done on admission</p>
+                            <p><strong>Focused Assessment:</strong> In-depth assessment of a specific problem, done after initial assessment</p>
+                            <p><strong>Emergency Assessment:</strong> Rapid assessment in life-threatening situations</p>
+                            <p><strong>Follow-up Assessment:</strong> Assessment to monitor progress of identified problems</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>التقييم الشامل:</strong> تاريخ صحي كامل وفحص جسدي، يتم عادة عند القبول</p>
+                            <p><strong>التقييم المركز:</strong> تقييم متعمق لمشكلة محددة، يتم بعد التقييم الأولي</p>
+                            <p><strong>التقييم الطارئ:</strong> تقييم سريع في المواقف التي تهدد الحياة</p>
+                            <p><strong>تقييم المتابعة:</strong> تقييم لمراقبة تقدم المشاكل المحددة</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Data Types Summary (ملخص أنواع البيانات)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Subjective Data:</strong> What the patient says or feels (symptoms)</p>
+                            <p><strong>Objective Data:</strong> What can be observed or measured (signs)</p>
+                            <p><strong>Primary Source:</strong> Information directly from the patient</p>
+                            <p><strong>Secondary Source:</strong> Information from family, records, or other healthcare providers</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>البيانات الذاتية:</strong> ما يقوله أو يشعر به المريض (الأعراض)</p>
+                            <p><strong>البيانات الموضوعية:</strong> ما يمكن ملاحظته أو قياسه (العلامات)</p>
+                            <p><strong>المصدر الأساسي:</strong> معلومات مباشرة من المريض</p>
+                            <p><strong>المصدر الثانوي:</strong> معلومات من العائلة أو السجلات أو مقدمي الرعاية الصحية الآخرين</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Interview Process Summary (ملخص عملية المقابلة)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Introductory Phase:</strong> Establish rapport, set the environment, state purpose</p>
+                            <p><strong>Working Phase:</strong> Collect data, use therapeutic communication</p>
+                            <p><strong>Termination Phase:</strong> Summarize, validate, plan for next steps</p>
+                            <p><strong>Communication Skills:</strong> Listening, silence, open-ended questions, avoid leading questions</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>المرحلة التمهيدية:</strong> إقامة علاقة، تهيئة البيئة، تحديد الغرض</p>
+                            <p><strong>المرحلة العاملة:</strong> جمع البيانات، استخدام التواصل العلاجي</p>
+                            <p><strong>مرحلة الإنهاء:</strong> التلخيص، التحقق، التخطيط للخطوات التالية</p>
+                            <p><strong>مهارات التواصل:</strong> الاستماع، الصمت، الأسئلة المفتوحة، تجنب الأسئلة الإيحائية</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Health History Components Summary (ملخص مكونات التاريخ الصحي)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>Demographic Data:</strong> Age, gender, education, occupation, etc.</p>
+                            <p><strong>Chief Complaint:</strong> Reason for seeking care, described using COLDSPA</p>
+                            <p><strong>History of Present Illness:</strong> Chronological record of current problem</p>
+                            <p><strong>Past Health History:</strong> Previous illnesses, surgeries, hospitalizations</p>
+                            <p><strong>Current Health Status:</strong> Medications, allergies, habits, immunizations</p>
+                            <p><strong>Psychosocial History:</strong> Family, support systems, stressors</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>البيانات الديموغرافية:</strong> العمر، الجنس، التعليم، المهنة، إلخ.</p>
+                            <p><strong>الشكوى الرئيسية:</strong> سبب طلب الرعاية، موصوف باستخدام COLDSPA</p>
+                            <p><strong>تاريخ المرض الحالي:</strong> سجل زمني للمشكلة الحالية</p>
+                            <p><strong>التاريخ الصحي السابق:</strong> أمراض سابقة، عمليات، استشفاء</p>
+                            <p><strong>الحالة الصحية الحالية:</strong> أدوية، حساسية، عادات، تطعيمات</p>
+                            <p><strong>التاريخ النفسي الاجتماعي:</strong> العائلة، أنظمة الدعم، مسببات الإجهاد</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>COLDSPA Mnemonic Summary (ملخص اختصار COLDSPA)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p><strong>C - Character:</strong> Description of the symptom (how it feels, looks, sounds, smells)</p>
+                            <p><strong>O - Onset:</strong> When the symptom began</p>
+                            <p><strong>L - Location:</strong> Where the symptom is located and if it radiates</p>
+                            <p><strong>D - Duration:</strong> How long the symptom lasts and if it recurs</p>
+                            <p><strong>S - Severity:</strong> How bad the symptom is</p>
+                            <p><strong>P - Pattern:</strong> What makes the symptom better or worse</p>
+                            <p><strong>A - Associated factors:</strong> Other symptoms that occur with it</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p><strong>C - الطبيعة:</strong> وصف العرض (كيف يشعر، يبدو، يبدو، يشم)</p>
+                            <p><strong>O - البداية:</strong> متى بدأ العرض</p>
+                            <p><strong>L - الموقع:</strong> أين يقع العرض وإذا كان يشع</p>
+                            <p><strong>D - المدة:</strong> كم يدوم العرض وإذا كان يتكرر</p>
+                            <p><strong>S - الشدة:</strong> مدى سوء العرض</p>
+                            <p><strong>P - النمط:</strong> ما يجعل العرض أفضل أو أسوأ</p>
+                            <p><strong>A - العوامل المرتبطة:</strong> أعراض أخرى تحدث معه</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h3>Key Points to Remember (نقاط رئيسية يجب تذكرها)</h3>
+                    <div class="dual-text-row">
+                        <div class="english-side">
+                            <p>• Assessment is the foundation of the nursing process</p>
+                            <p>• Subjective data comes from the patient, objective data can be measured</p>
+                            <p>• Open-ended questions encourage detailed responses</p>
+                            <p>• Leading questions should be avoided as they can influence answers</p>
+                            <p>• Silence is a therapeutic communication technique</p>
+                            <p>• COLDSPA helps organize symptom descriptions</p>
+                            <p>• Comprehensive assessment is done on admission</p>
+                            <p>• Emergency assessment is for life-threatening situations</p>
+                        </div>
+                        <div class="arabic-side">
+                            <p>• التقييم هو أساس عملية التمريض</p>
+                            <p>• البيانات الذاتية تأتي من المريض، البيانات الموضوعية يمكن قياسها</p>
+                            <p>• الأسئلة المفتوحة تشجع على الردود المفصلة</p>
+                            <p>• يجب تجنب الأسئلة الإيحائية حيث يمكن أن تؤثر على الإجابات</p>
+                            <p>• الصمت هو تقنية تواصل علاجية</p>
+                            <p>• COLDSPA يساعد في تنظيم أوصاف الأعراض</p>
+                            <p>• يتم إجراء التقييم الشامل عند القبول</p>
+                            <p>• التقييم الطارئ للحالات التي تهدد الحياة</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 6: Key Comparisons -->
+        <div id="page6" class="page">
+            <h1>🔄 Key Comparisons - أهم المقارنات</h1>
+            
+            <div class="comparison-container numbered-section">
+                <div class="numbered-item">
+                    <h2>Comparison 1</h2>
+                    <h3>Subjective vs Objective Data</h3>
+                    
+                    <div class="comparison-table">
+                        <div class="comparison-header">
+                            <div class="comparison-title-en">Subjective Data</div>
+                            <div class="comparison-vs">VS</div>
+                            <div class="comparison-title-ar">Objective Data</div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Definition:</h4>
+                                <p>What patient SAYS or FEELS</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Definition:</h4>
+                                <p>What nurse OBSERVES or MEASURES</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>التعريف:</h4>
+                                <p>ما يقوله أو يشعر به المريض</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>التعريف:</h4>
+                                <p>ما تلاحظه أو تقيسه الممرضة</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Examples:</h4>
+                                <p>Pain, dizziness, nausea, fatigue</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Examples:</h4>
+                                <p>Blood pressure, heart rate, edema, wound</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>أمثلة:</h4>
+                                <p>الألم، الدوار، الغثيان، الإرهاق</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>أمثلة:</h4>
+                                <p>ضغط الدم، معدل ضربات القلب، الوذمة، الجرح</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Collection:</h4>
+                                <p>Through interview and questioning</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Collection:</h4>
+                                <p>Through physical examination and tests</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>الجمع:</h4>
+                                <p>من خلال المقابلة والأسئلة</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>الجمع:</h4>
+                                <p>من خلال الفحص الجسدي والاختبارات</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h2>Comparison 2</h2>
+                    <h3>Types of Assessment</h3>
+                    
+                    <div class="comparison-table">
+                        <div class="comparison-header">
+                            <div class="comparison-title-en">Comprehensive</div>
+                            <div class="comparison-vs">VS</div>
+                            <div class="comparison-title-ar">Focused</div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Purpose:</h4>
+                                <p>Complete health overview</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Purpose:</h4>
+                                <p>Specific problem assessment</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>الغرض:</h4>
+                                <p>نظرة صحية كاملة</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>الغرض:</h4>
+                                <p>تقييم مشكلة محددة</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Timing:</h4>
+                                <p>Usually on admission</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Timing:</h4>
+                                <p>After initial assessment</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>التوقيت:</h4>
+                                <p>عادة عند القبول</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>التوقيت:</h4>
+                                <p>بعد التقييم الأولي</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Components:</h4>
+                                <p>Complete health history and physical exam</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Components:</h4>
+                                <p>Limited to specific area or problem</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>المكونات:</h4>
+                                <p>تاريخ صحي كامل وفحص جسدي</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>المكونات:</h4>
+                                <p>محدودة بمنطقة أو مشكلة معينة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h2>Comparison 3</h2>
+                    <h3>Open-ended vs Closed-ended Questions</h3>
+                    
+                    <div class="comparison-table">
+                        <div class="comparison-header">
+                            <div class="comparison-title-en">Open-ended Questions</div>
+                            <div class="comparison-vs">VS</div>
+                            <div class="comparison-title-ar">Closed-ended Questions</div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Purpose:</h4>
+                                <p>Encourage detailed responses</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Purpose:</h4>
+                                <p>Obtain specific information</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>الغرض:</h4>
+                                <p>تشجيع الردود المفصلة</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>الغرض:</h4>
+                                <p>الحصول على معلومات محددة</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Examples:</h4>
+                                <p>"Tell me about your pain"</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Examples:</h4>
+                                <p>"Do you have pain?"</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>أمثلة:</h4>
+                                <p>"أخبرني عن ألمك"</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>أمثلة:</h4>
+                                <p>"هل تشعر بألم؟"</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Response:</h4>
+                                <p>Detailed, narrative</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Response:</h4>
+                                <p>Brief, yes/no</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>الرد:</h4>
+                                <p>مفصل، سردي</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>الرد:</h4>
+                                <p>موجز، نعم/لا</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <h2>Comparison 4</h2>
+                    <h3>Primary vs Secondary Sources</h3>
+                    
+                    <div class="comparison-table">
+                        <div class="comparison-header">
+                            <div class="comparison-title-en">Primary Source</div>
+                            <div class="comparison-vs">VS</div>
+                            <div class="comparison-title-ar">Secondary Source</div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Definition:</h4>
+                                <p>Information directly from the patient</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Definition:</h4>
+                                <p>Information from others or records</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>التعريف:</h4>
+                                <p>معلومات مباشرة من المريض</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>التعريف:</h4>
+                                <p>معلومات من الآخرين أو السجلات</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Examples:</h4>
+                                <p>Patient's verbal report</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Examples:</h4>
+                                <p>Family members, medical records</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>أمثلة:</h4>
+                                <p>التقرير اللفظي للمريض</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>أمثلة:</h4>
+                                <p>أفراد العائلة، السجلات الطبية</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row">
+                            <div class="comparison-cell-left">
+                                <h4>Reliability:</h4>
+                                <p>Most reliable for subjective data</p>
+                            </div>
+                            <div class="comparison-cell-right">
+                                <h4>Reliability:</h4>
+                                <p>Useful when patient can't communicate</p>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row-ar">
+                            <div class="comparison-cell-left-ar">
+                                <h4>الموثوقية:</h4>
+                                <p>الأكثر موثوقية للبيانات الذاتية</p>
+                            </div>
+                            <div class="comparison-cell-right-ar">
+                                <h4>الموثوقية:</h4>
+                                <p>مفيد عندما لا يستطيع المريض التواصل</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 7: Audio Dictionary -->
+        <div id="page7" class="page">
+            <h1>🔊 Audio Dictionary - القاموس الصوتي</h1>
+            
+            <div class="numbered-section">
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Assessment</h3>
+                        <h4>التقييم</h4>
+                        <button class="speak-btn" onclick="speakText('Assessment')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                First step in nursing process; systematic collection of patient data
+                            </div>
+                            <div class="arabic-side">
+                                الخطوة الأولى في عملية التمريض؛ جمع منهجي لبيانات المريض
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Diagnosis</h3>
+                        <h4>التشخيص</h4>
+                        <button class="speak-btn" onclick="speakText('Diagnosis')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Second step in nursing process; identification of health problems
+                            </div>
+                            <div class="arabic-side">
+                                الخطوة الثانية في عملية التمريض؛ تحديد المشاكل الصحية
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Planning</h3>
+                        <h4>التخطيط</h4>
+                        <button class="speak-btn" onclick="speakText('Planning')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Third step in nursing process; development of goals and interventions
+                            </div>
+                            <div class="arabic-side">
+                                الخطوة الثالثة في عملية التمريض؛ تطوير الأهداف والتدخلات
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Implementation</h3>
+                        <h4>التنفيذ</h4>
+                        <button class="speak-btn" onclick="speakText('Implementation')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Fourth step in nursing process; execution of planned interventions
+                            </div>
+                            <div class="arabic-side">
+                                الخطوة الرابعة في عملية التمريض؛ تنفيذ التدخلات المخطط لها
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Evaluation</h3>
+                        <h4>التقييم النهائي</h4>
+                        <button class="speak-btn" onclick="speakText('Evaluation')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Fifth step in nursing process; assessment of effectiveness of interventions
+                            </div>
+                            <div class="arabic-side">
+                                الخطوة الخامسة في عملية التمريض؛ تقييم فعالية التدخلات
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Subjective Data</h3>
+                        <h4>البيانات الذاتية</h4>
+                        <button class="speak-btn" onclick="speakText('Subjective Data')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Information that the patient reports or feels; symptoms
+                            </div>
+                            <div class="arabic-side">
+                                معلومات يبلغ عنها أو يشعر بها المريض؛ الأعراض
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Objective Data</h3>
+                        <h4>البيانات الموضوعية</h4>
+                        <button class="speak-btn" onclick="speakText('Objective Data')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Information that can be observed or measured; signs
+                            </div>
+                            <div class="arabic-side">
+                                معلومات يمكن ملاحظتها أو قياسها؛ العلامات
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Comprehensive Assessment</h3>
+                        <h4>التقييم الشامل</h4>
+                        <button class="speak-btn" onclick="speakText('Comprehensive Assessment')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Complete health history and physical examination; usually done on admission
+                            </div>
+                            <div class="arabic-side">
+                                تاريخ صحي كامل وفحص جسدي؛ يتم عادة عند القبول
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Focused Assessment</h3>
+                        <h4>التقييم المركز</h4>
+                        <button class="speak-btn" onclick="speakText('Focused Assessment')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                In-depth assessment of a specific problem; done after initial assessment
+                            </div>
+                            <div class="arabic-side">
+                                تقييم متعمق لمشكلة محددة؛ يتم بعد التقييم الأولي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Emergency Assessment</h3>
+                        <h4>التقييم الطارئ</h4>
+                        <button class="speak-btn" onclick="speakText('Emergency Assessment')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Rapid assessment in life-threatening situations
+                            </div>
+                            <div class="arabic-side">
+                                تقييم سريع في المواقف التي تهدد الحياة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Follow-up Assessment</h3>
+                        <h4>تقييم المتابعة</h4>
+                        <button class="speak-btn" onclick="speakText('Follow-up Assessment')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Assessment to monitor progress of identified problems
+                            </div>
+                            <div class="arabic-side">
+                                تقييم لمراقبة تقدم المشاكل المحددة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Primary Source</h3>
+                        <h4>المصدر الأساسي</h4>
+                        <button class="speak-btn" onclick="speakText('Primary Source')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Information directly from the patient
+                            </div>
+                            <div class="arabic-side">
+                                معلومات مباشرة من المريض
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Secondary Source</h3>
+                        <h4>المصدر الثانوي</h4>
+                        <button class="speak-btn" onclick="speakText('Secondary Source')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Information from family, records, or other healthcare providers
+                            </div>
+                            <div class="arabic-side">
+                                معلومات من العائلة أو السجلات أو مقدمي الرعاية الصحية الآخرين
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Open-ended Question</h3>
+                        <h4>السؤال المفتوح</h4>
+                        <button class="speak-btn" onclick="speakText('Open-ended Question')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Question that encourages detailed responses; cannot be answered with yes/no
+                            </div>
+                            <div class="arabic-side">
+                                سؤال يشجع على الردود المفصلة؛ لا يمكن الإجابة عليه بنعم/لا
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Closed-ended Question</h3>
+                        <h4>السؤال المغلق</h4>
+                        <button class="speak-btn" onclick="speakText('Closed-ended Question')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Question that requires a brief response; usually yes/no
+                            </div>
+                            <div class="arabic-side">
+                                سؤال يتطلب رداً موجزاً؛ عادة نعم/لا
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Leading Question</h3>
+                        <h4>السؤال الإيحائي</h4>
+                        <button class="speak-btn" onclick="speakText('Leading Question')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Question that suggests the desired answer; should be avoided
+                            </div>
+                            <div class="arabic-side">
+                                سؤال يقترح الإجابة المطلوبة؛ يجب تجنبه
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Chief Complaint</h3>
+                        <h4>الشكوى الرئيسية</h4>
+                        <button class="speak-btn" onclick="speakText('Chief Complaint')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Reason for seeking healthcare; described using COLDSPA
+                            </div>
+                            <div class="arabic-side">
+                                سبب طلب الرعاية الصحية؛ موصوف باستخدام COLDSPA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>COLDSPA</h3>
+                        <h4>COLDSPA</h4>
+                        <button class="speak-btn" onclick="speakText('COLDSPA')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Mnemonic for symptom description: Character, Onset, Location, Duration, Severity, Pattern, Associated factors
+                            </div>
+                            <div class="arabic-side">
+                                اختصار لوصف الأعراض: الطبيعة، البداية، الموقع، المدة، الشدة، النمط، العوامل المرتبطة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>History of Present Illness</h3>
+                        <h4>تاريخ المرض الحالي</h4>
+                        <button class="speak-btn" onclick="speakText('History of Present Illness')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Chronological record of current health problem from onset to present
+                            </div>
+                            <div class="arabic-side">
+                                سجل زمني للمشكلة الصحية الحالية من البداية إلى الوقت الحاضر
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="glossary-item">
+                        <h3>Past Health History</h3>
+                        <h4>التاريخ الصحي السابق</h4>
+                        <button class="speak-btn" onclick="speakText('Past Health History')">🔊 Pronounce</button>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Information about previous illnesses, surgeries, hospitalizations
+                            </div>
+                            <div class="arabic-side">
+                                معلومات عن الأمراض السابقة والعمليات والاستشفاء
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 8: Important Numbers -->
+        <div id="page8" class="page">
+            <h1>🔢 Important Numbers - الأرقام المهمة</h1>
+            
+            <div class="numbered-section">
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Nursing Process Steps</h3>
+                        <h4>عدد خطوات عملية التمريض</h4>
+                        <div class="number-highlight">5</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Assessment → Diagnosis → Planning → Implementation → Evaluation
+                            </div>
+                            <div class="arabic-side">
+                                تقييم → تشخيص → تخطيط → تنفيذ → تقييم نهائي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Assessment Types</h3>
+                        <h4>عدد أنواع التقييم</h4>
+                        <div class="number-highlight">4</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Comprehensive → Focused → Emergency → Follow-up
+                            </div>
+                            <div class="arabic-side">
+                                شامل → مركز → طارئ → متابعة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Interview Phases</h3>
+                        <h4>عدد مراحل المقابلة</h4>
+                        <div class="number-highlight">3</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Introductory → Working → Termination
+                            </div>
+                            <div class="arabic-side">
+                                تمهيدية → عاملة → إنهاء
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of COLDSPA Components</h3>
+                        <h4>عدد مكونات COLDSPA</h4>
+                        <div class="number-highlight">7</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Character → Onset → Location → Duration → Severity → Pattern → Associated factors
+                            </div>
+                            <div class="arabic-side">
+                                طبيعة → بداية → موقع → مدة → شدة → نمط → عوامل مرتبطة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Health History Components</h3>
+                        <h4>عدد مكونات التاريخ الصحي</h4>
+                        <div class="number-highlight">6</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Demographic Data → Chief Complaint → History of Present Illness → Past Health History → Current Health Status → Psychosocial History
+                            </div>
+                            <div class="arabic-side">
+                                بيانات ديموغرافية → شكوى رئيسية → تاريخ المرض الحالي → تاريخ صحي سابق → حالة صحية حالية → تاريخ نفسي اجتماعي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Distance for Therapeutic Communication</h3>
+                        <h4>المسافة للتواصل العلاجي</h4>
+                        <div class="number-highlight">3 ft</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Recommended distance between nurse and patient during interview
+                            </div>
+                            <div class="arabic-side">
+                                المسافة الموصى بها بين الممرضة والمريض أثناء المقابلة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Data Types</h3>
+                        <h4>عدد أنواع البيانات</h4>
+                        <div class="number-highlight">2</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Subjective Data → Objective Data
+                            </div>
+                            <div class="arabic-side">
+                                بيانات ذاتية → بيانات موضوعية
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Data Sources</h3>
+                        <h4>عدد مصادر البيانات</h4>
+                        <div class="number-highlight">2</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Primary Source → Secondary Source
+                            </div>
+                            <div class="arabic-side">
+                                مصدر أساسي → مصدر ثانوي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Question Types</h3>
+                        <h4>عدد أنواع الأسئلة</h4>
+                        <div class="number-highlight">3</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Open-ended → Closed-ended → Leading
+                            </div>
+                            <div class="arabic-side">
+                                مفتوح → مغلق → إيحائي
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="numbered-item">
+                    <div class="number-card">
+                        <h3>Number of Communication Skills</h3>
+                        <h4>عدد مهارات التواصل</h4>
+                        <div class="number-highlight">5</div>
+                        <div class="dual-text-row">
+                            <div class="english-side">
+                                Listening → Silence → Open-ended Questions → Avoid Closed-ended Questions → Avoid Leading Questions
+                            </div>
+                            <div class="arabic-side">
+                                استماع → صمت → أسئلة مفتوحة → تجنب الأسئلة المغلقة → تجنب الأسئلة الإيحائية
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3 style="font-size:1.8rem; margin-bottom:1.5rem;">📞 تواصل معنا - Contact Us</h3>
+            
+            <div class="contact-links">
+                <a href="https://wa.me/201121833902" target="_blank" class="contact-item">
+                    <span class="contact-icon">📱</span>
+                    <span class="contact-text">WhatsApp - واتساب</span>
+                    <span class="contact-number">01121833902</span>
+                </a>
+                
+                <a href="tel:+201012575443" class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span class="contact-text">Call - اتصال</span>
+                    <span class="contact-number">01012575443</span>
+                </a>
+                
+                <a href="https://www.facebook.com/share/1CjgYdbne7/" target="_blank" class="contact-item">
+                    <span class="contact-icon">👤</span>
+                    <span class="contact-text">Facebook - فيسبوك</span>
+                    <span class="contact-number">تابعنا</span>
+                </a>
+            </div>
+            
+            <div class="footer-dedication">
+                <div class="dedication-icon">🤲</div>
+                <h3>صدقة جارية</h3>
+                <p>
+                    اللهم اجعل هذا العمل في ميزان حسناتي<br>
+                    وصدقة جارية لعمتي رحمة الله عليها<br>
+                    ولجميع المسلمين والمسلمات<br>
+                    الأحياء منهم والأموات<br><br>
+                    
+                    <strong>اللهم اغفر لهم وارحمهم وعافهم واعف عنهم<br>
+                    وأكرم نزلهم ووسع مدخلهم<br>
+                    واغسلهم بالماء والثلج والبرد<br>
+                    ونقهم من الخطايا كما ينقى الثوب الأبيض من الدنس<br>
+                    وأبدلهم داراً خيراً من دارهم وأهلاً خيراً من أهلهم<br>
+                    وأدخلهم الجنة وأعذهم من عذاب القبر ومن عذاب النار<br>
+                    واجعل قبورهم روضة من رياض الجنة</strong><br><br>
+                    
+                    آمين يا رب العالمين 🤲
+                </p>
+            </div>
+            
+            <div class="footer-developer">
+                <p style="font-size:1.3rem; font-weight:700; margin-top:3rem;">
+                    Developed with ❤️ by <span style="background: linear-gradient(135deg, #FFD700, #FF6B6B); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Mohamed Salah</span>
+                </p>
+                <p style="font-size:1.1rem; margin-top:0.5rem; opacity:0.9;">
+                    © 2025 - All Rights Reserved
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Flashcards Data
+        const flashcardsData = [
+            {
+                front: "Assessment",
+                back: {
+                    term: "Assessment",
+                    translation: "التقييم",
+                    english: "- First step in nursing process<br>- Systematic data collection<br>- Foundation for care",
+                    arabic: "- الخطوة الأولى<br>- جمع البيانات المنهجي<br>- أساس الرعاية"
+                }
+            },
+            {
+                front: "Diagnosis",
+                back: {
+                    term: "Diagnosis",
+                    translation: "التشخيص",
+                    english: "- Second step in nursing process<br>- Identification of health problems<br>- Based on assessment data",
+                    arabic: "- الخطوة الثانية<br>- تحديد المشاكل الصحية<br>- بناءً على بيانات التقييم"
+                }
+            },
+            {
+                front: "Planning",
+                back: {
+                    term: "Planning",
+                    translation: "التخطيط",
+                    english: "- Third step in nursing process<br>- Development of goals and interventions<br>- Patient-centered approach",
+                    arabic: "- الخطوة الثالثة<br>- تطوير الأهداف والتدخلات<br>- نهج يركز على المريض"
+                }
+            },
+            {
+                front: "Implementation",
+                back: {
+                    term: "Implementation",
+                    translation: "التنفيذ",
+                    english: "- Fourth step in nursing process<br>- Execution of planned interventions<br>- Direct patient care",
+                    arabic: "- الخطوة الرابعة<br>- تنفيذ التدخلات المخطط لها<br>- رعاية مباشرة للمريض"
+                }
+            },
+            {
+                front: "Evaluation",
+                back: {
+                    term: "Evaluation",
+                    translation: "التقييم النهائي",
+                    english: "- Fifth step in nursing process<br>- Assessment of effectiveness<br>- Determines if goals were met",
+                    arabic: "- الخطوة الخامسة<br>- تقييم الفعالية<br>- يحدد ما إذا تم تحقيق الأهداف"
+                }
+            },
+            {
+                front: "Subjective Data",
+                back: {
+                    term: "Subjective Data",
+                    translation: "البيانات الذاتية",
+                    english: "- What patient says or feels<br>- Symptoms<br>- Cannot be measured",
+                    arabic: "- ما يقوله أو يشعر به المريض<br>- الأعراض<br>- لا يمكن قياسها"
+                }
+            },
+            {
+                front: "Objective Data",
+                back: {
+                    term: "Objective Data",
+                    translation: "البيانات الموضوعية",
+                    english: "- What can be observed or measured<br>- Signs<br>- Verifiable by others",
+                    arabic: "- ما يمكن ملاحظته أو قياسه<br>- العلامات<br>- يمكن التحقق منها من قبل الآخرين"
+                }
+            },
+            {
+                front: "Comprehensive Assessment",
+                back: {
+                    term: "Comprehensive Assessment",
+                    translation: "التقييم الشامل",
+                    english: "- Complete health history<br>- Full physical examination<br>- Usually on admission",
+                    arabic: "- تاريخ صحي كامل<br>- فحص جسدي كامل<br>- عادة عند القبول"
+                }
+            },
+            {
+                front: "Focused Assessment",
+                back: {
+                    term: "Focused Assessment",
+                    translation: "التقييم المركز",
+                    english: "- Specific problem assessment<br>- Limited to one area<br>- After initial assessment",
+                    arabic: "- تقييم مشكلة محددة<br>- محدود بمنطقة واحدة<br>- بعد التقييم الأولي"
+                }
+            },
+            {
+                front: "Emergency Assessment",
+                back: {
+                    term: "Emergency Assessment",
+                    translation: "التقييم الطارئ",
+                    english: "- Rapid assessment<br>- Life-threatening situations<br>- ABC priority",
+                    arabic: "- تقييم سريع<br>- مواقف تهدد الحياة<br>- أولوية ABC"
+                }
+            },
+            {
+                front: "Follow-up Assessment",
+                back: {
+                    term: "Follow-up Assessment",
+                    translation: "تقييم المتابعة",
+                    english: "- Monitor progress<br>- After problem identification<br>- Ongoing process",
+                    arabic: "- مراقبة التقدم<br>- بعد تحديد المشكلة<br>- عملية مستمرة"
+                }
+            },
+            {
+                front: "Primary Source",
+                back: {
+                    term: "Primary Source",
+                    translation: "المصدر الأساسي",
+                    english: "- Directly from patient<br>- Most reliable<br>- Patient's own words",
+                    arabic: "- مباشرة من المريض<br>- الأكثر موثوقية<br>- كلمات المريض الخاصة"
+                }
+            },
+            {
+                front: "Secondary Source",
+                back: {
+                    term: "Secondary Source",
+                    translation: "المصدر الثانوي",
+                    english: "- From others or records<br>- When patient can't communicate<br>- Supplemental information",
+                    arabic: "- من الآخرين أو السجلات<br>- عندما لا يستطيع المريض التواصل<br>- معلومات تكميلية"
+                }
+            },
+            {
+                front: "Open-ended Question",
+                back: {
+                    term: "Open-ended Question",
+                    translation: "السؤال المفتوح",
+                    english: "- Encourages detailed response<br>- Begins with 'what', 'how', 'tell me'<br>- Cannot be answered with yes/no",
+                    arabic: "- يشجع على رد مفصل<br>- يبدأ بـ 'ماذا'، 'كيف'، 'أخبرني'<br>- لا يمكن الإجابة عليه بنعم/لا"
+                }
+            },
+            {
+                front: "Closed-ended Question",
+                back: {
+                    term: "Closed-ended Question",
+                    translation: "السؤال المغلق",
+                    english: "- Requires brief response<br>- Usually yes/no<br>- For specific information",
+                    arabic: "- يتطلب رداً موجزاً<br>- عادة نعم/لا<br>- لمعلومات محددة"
+                }
+            },
+            {
+                front: "Leading Question",
+                back: {
+                    term: "Leading Question",
+                    translation: "السؤال الإيحائي",
+                    english: "- Suggests desired answer<br>- Should be avoided<br>- Can influence patient",
+                    arabic: "- يقترح الإجابة المطلوبة<br>- يجب تجنبه<br>- يمكن أن يؤثر على المريض"
+                }
+            },
+            {
+                front: "Introductory Phase",
+                back: {
+                    term: "Introductory Phase",
+                    translation: "المرحلة التمهيدية",
+                    english: "- Establish rapport<br>- Set environment<br>- State purpose",
+                    arabic: "- إقامة علاقة<br>- تهيئة البيئة<br>- تحديد الغرض"
+                }
+            },
+            {
+                front: "Working Phase",
+                back: {
+                    term: "Working Phase",
+                    translation: "المرحلة العاملة",
+                    english: "- Data collection<br>- Therapeutic communication<br>- Identify needs",
+                    arabic: "- جمع البيانات<br>- التواصل العلاجي<br>- تحديد الاحتياجات"
+                }
+            },
+            {
+                front: "Termination Phase",
+                back: {
+                    term: "Termination Phase",
+                    translation: "مرحلة الإنهاء",
+                    english: "- Summarize data<br>- Validate information<br>- Plan next steps",
+                    arabic: "- تلخيص البيانات<br>- التحقق من المعلومات<br>- التخطيط للخطوات التالية"
+                }
+            },
+            {
+                front: "Chief Complaint",
+                back: {
+                    term: "Chief Complaint",
+                    translation: "الشكوى الرئيسية",
+                    english: "- Reason for seeking care<br>- Patient's own words<br>- Described with COLDSPA",
+                    arabic: "- سبب طلب الرعاية<br>- كلمات المريض الخاصة<br>- موصوف بـ COLDSPA"
+                }
+            },
+            {
+                front: "COLDSPA",
+                back: {
+                    term: "COLDSPA",
+                    translation: "COLDSPA",
+                    english: "- Character<br>- Onset<br>- Location<br>- Duration<br>- Severity<br>- Pattern<br>- Associated factors",
+                    arabic: "- طبيعة<br>- بداية<br>- موقع<br>- مدة<br>- شدة<br>- نمط<br>- عوامل مرتبطة"
+                }
+            },
+            {
+                front: "History of Present Illness",
+                back: {
+                    term: "History of Present Illness",
+                    translation: "تاريخ المرض الحالي",
+                    english: "- Chronological record<br>- From onset to present<br>- Progression of symptoms",
+                    arabic: "- سجل زمني<br>- من البداية إلى الحاضر<br>- تقدم الأعراض"
+                }
+            },
+            {
+                front: "Past Health History",
+                back: {
+                    term: "Past Health History",
+                    translation: "التاريخ الصحي السابق",
+                    english: "- Previous illnesses<br>- Surgeries<br>- Hospitalizations",
+                    arabic: "- أمراض سابقة<br>- عمليات<br>- استشفاء"
+                }
+            },
+            {
+                front: "Current Health Status",
+                back: {
+                    term: "Current Health Status",
+                    translation: "الحالة الصحية الحالية",
+                    english: "- Medications<br>- Allergies<br>- Habits<br>- Immunizations",
+                    arabic: "- أدوية<br>- حساسية<br>- عادات<br>- تطعيمات"
+                }
+            },
+            {
+                front: "Psychosocial History",
+                back: {
+                    term: "Psychosocial History",
+                    translation: "التاريخ النفسي الاجتماعي",
+                    english: "- Family situation<br>- Support systems<br>- Stressors",
+                    arabic: "- الوضع العائلي<br>- أنظمة الدعم<br>- مسببات الإجهاد"
+                }
+            },
+            {
+                front: "Listening",
+                back: {
+                    term: "Listening",
+                    translation: "الاستماع",
+                    english: "- Active attention<br>- Maintain eye contact<br>- Avoid interruption",
+                    arabic: "- انتباه نشط<br>- الحفاظ على التواصل البصري<br>- تجنب المقاطعة"
+                }
+            },
+            {
+                front: "Silence",
+                back: {
+                    term: "Silence",
+                    translation: "الصمت",
+                    english: "- Therapeutic technique<br>- Allow thinking time<br>- Encourage elaboration",
+                    arabic: "- تقنية علاجية<br>- السماح بوقت للتفكير<br>- تشجيع على التفصيل"
+                }
+            },
+            {
+                front: "Demographic Data",
+                back: {
+                    term: "Demographic Data",
+                    translation: "البيانات الديموغرافية",
+                    english: "- Age<br>- Gender<br>- Education<br>- Occupation<br>- Religion",
+                    arabic: "- العمر<br>- الجنس<br>- التعليم<br>- المهنة<br>- الديانة"
+                }
+            },
+            {
+                front: "Review of Systems",
+                back: {
+                    term: "Review of Systems",
+                    translation: "مراجعة الأنظمة",
+                    english: "- Head-to-toe questions<br>- Systematic approach<br>- Identify hidden problems",
+                    arabic: "- أسئلة من الرأس إلى القدمين<br>- نهج منهجي<br>- تحديد المشاكل الخفية"
+                }
+            },
+            {
+                front: "Physical Examination",
+                back: {
+                    term: "Physical Examination",
+                    translation: "الفحص الجسدي",
+                    english: "- Inspection<br>- Palpation<br>- Percussion<br>- Auscultation",
+                    arabic: "- الفحص البصري<br>- الجس<br>- القرع<br>- السماع"
+                }
+            },
+            {
+                front: "Documentation",
+                back: {
+                    term: "Documentation",
+                    translation: "التوثيق",
+                    english: "- Record findings<br>- Legal requirement<br>- Communication tool<br>- Continuity of care",
+                    arabic: "- تسجيل النتائج<br>- متطلب قانوني<br>- أداة تواصل<br>- استمرارية الرعاية"
+                }
+            }
+        ];
+
+        let currentCardIndex = 0;
+
+        // Initialize flashcard
+        function updateFlashcard() {
+            const card = flashcardsData[currentCardIndex];
+            document.getElementById('card-front-text').textContent = card.front;
+            document.getElementById('current-card').textContent = currentCardIndex + 1;
+            document.getElementById('total-cards').textContent = flashcardsData.length;
+            
+            const backDiv = document.querySelector('.flashcard-back');
+            backDiv.innerHTML = `
+                <h2>${card.back.term}</h2>
+                <h3>(${card.back.translation})</h3>
+                <div class="dual-text-row">
+                    <div class="english-side">${card.back.english}</div>
+                    <div class="arabic-side">${card.back.arabic}</div>
+                </div>
+            `;
+        }
+
+        // Flashcard controls
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCardIndex < flashcardsData.length - 1) {
+                currentCardIndex++;
+                document.getElementById('flashcard').classList.remove('flipped');
+                updateFlashcard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                document.getElementById('flashcard').classList.remove('flipped');
+                updateFlashcard();
+            }
+        }
+
+        function speakFlashcard() {
+            const card = flashcardsData[currentCardIndex];
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(card.back.term);
+                u.lang = 'en-US';
+                u.rate = 0.75;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'en-US';
+                u.rate = 0.85;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // Question bank controls
+        function checkAnswer(element, isCorrect) {
+            const options = element.parentElement.querySelectorAll('.option');
+            const explanation = element.parentElement.nextElementSibling;
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+            } else {
+                element.classList.add('wrong');
+                options.forEach(opt => {
+                    if (opt !== element && !opt.classList.contains('wrong')) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            explanation.style.display = 'block';
+        }
+
+        // Navigation
+        function navigateToPage(id, link) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+            document.getElementById(id).classList.add('active-page');
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            link.classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('dark', isDark);
+            document.querySelector('.theme-toggle').textContent = isDark ? '☀️' : '🌙';
+        }
+
+        // Hide header on scroll
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            let scroll = window.pageYOffset;
+            const header = document.querySelector('header');
+            if (scroll > lastScroll && scroll > 100) {
+                header.classList.add('hidden');
+            } else {
+                header.classList.remove('hidden');
+            }
+            lastScroll = scroll;
+        });
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check for saved dark mode preference
+            if (localStorage.getItem('dark') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+            
+            // Initialize flashcard
+            updateFlashcard();
+            
+            // Hide welcome screen after 4 seconds
+            setTimeout(() => {
+                const w = document.getElementById('welcome-screen');
+                w.style.opacity = '0';
+                setTimeout(() => w.style.display = 'none', 500);
+            }, 4000);
+        });
+    </script>
+</body>
+</html>
